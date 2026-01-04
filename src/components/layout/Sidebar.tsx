@@ -1,0 +1,119 @@
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import {
+  Globe,
+  Satellite,
+  Orbit,
+  Rocket,
+  AlertTriangle,
+  BarChart3,
+  Settings,
+  HelpCircle,
+  Layers,
+  Zap,
+} from 'lucide-react';
+
+interface NavItemProps {
+  icon: React.ElementType;
+  label: string;
+  isActive?: boolean;
+  badge?: string | number;
+  onClick?: () => void;
+}
+
+const NavItem = ({ icon: Icon, label, isActive, badge, onClick }: NavItemProps) => (
+  <Button
+    variant="ghost"
+    className={cn(
+      'w-full justify-start gap-3 h-11 px-3 font-normal transition-all duration-200',
+      isActive && 'bg-primary/10 text-primary border-l-2 border-primary rounded-l-none'
+    )}
+    onClick={onClick}
+  >
+    <Icon className="h-4 w-4" />
+    <span className="flex-1 text-left">{label}</span>
+    {badge !== undefined && (
+      <span className={cn(
+        'text-[10px] px-1.5 py-0.5 rounded-full font-medium',
+        typeof badge === 'number' && badge > 0 
+          ? 'bg-destructive/20 text-destructive' 
+          : 'bg-muted text-muted-foreground'
+      )}>
+        {badge}
+      </span>
+    )}
+  </Button>
+);
+
+interface SidebarProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+  return (
+    <>
+      {/* Overlay for mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-40 md:hidden"
+          onClick={onClose}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          'fixed md:sticky top-0 left-0 h-screen w-64 bg-card/80 backdrop-blur-xl border-r border-border/50 z-50 transition-transform duration-300',
+          'md:translate-x-0',
+          isOpen ? 'translate-x-0' : '-translate-x-full'
+        )}
+      >
+        <div className="flex flex-col h-full pt-16 md:pt-4">
+          {/* Main Navigation */}
+          <div className="flex-1 p-3 space-y-1">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 mb-2">
+              Monitoring
+            </p>
+            <NavItem icon={Globe} label="Earth View" isActive />
+            <NavItem icon={Satellite} label="Satellites" badge={20} />
+            <NavItem icon={Orbit} label="Space Debris" badge={1842} />
+            <NavItem icon={AlertTriangle} label="Asteroids" badge={3} />
+            <NavItem icon={Zap} label="Solar Activity" />
+
+            <div className="py-3">
+              <div className="h-px bg-border/50" />
+            </div>
+
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 mb-2">
+              Planning
+            </p>
+            <NavItem icon={Rocket} label="Launch Planner" />
+            <NavItem icon={Layers} label="Orbit Designer" />
+            <NavItem icon={BarChart3} label="Analytics" />
+
+            <div className="py-3">
+              <div className="h-px bg-border/50" />
+            </div>
+
+            <NavItem icon={Settings} label="Settings" />
+            <NavItem icon={HelpCircle} label="Help & Docs" />
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-border/50">
+            <div className="p-3 rounded-lg bg-secondary/30 border border-border/50">
+              <p className="text-xs font-medium mb-1">Pro Features</p>
+              <p className="text-[10px] text-muted-foreground mb-2">
+                Unlock AI predictions & advanced simulations
+              </p>
+              <Button variant="glow" size="sm" className="w-full text-xs">
+                Upgrade Now
+              </Button>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </>
+  );
+};
