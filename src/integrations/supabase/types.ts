@@ -14,7 +14,303 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      collision_predictions: {
+        Row: {
+          ai_analysis: string | null
+          created_at: string | null
+          id: string
+          is_resolved: boolean | null
+          minimum_distance: number
+          object1_id: string
+          object1_name: string
+          object1_type: string
+          object2_id: string
+          object2_name: string
+          object2_type: string
+          probability: number
+          recommended_action: string | null
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          time_to_closest_approach: number
+          updated_at: string | null
+        }
+        Insert: {
+          ai_analysis?: string | null
+          created_at?: string | null
+          id?: string
+          is_resolved?: boolean | null
+          minimum_distance: number
+          object1_id: string
+          object1_name: string
+          object1_type: string
+          object2_id: string
+          object2_name: string
+          object2_type: string
+          probability: number
+          recommended_action?: string | null
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          time_to_closest_approach: number
+          updated_at?: string | null
+        }
+        Update: {
+          ai_analysis?: string | null
+          created_at?: string | null
+          id?: string
+          is_resolved?: boolean | null
+          minimum_distance?: number
+          object1_id?: string
+          object1_name?: string
+          object1_type?: string
+          object2_id?: string
+          object2_name?: string
+          object2_type?: string
+          probability?: number
+          recommended_action?: string | null
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          time_to_closest_approach?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      launch_plans: {
+        Row: {
+          ai_recommendations: string | null
+          collision_risk_assessment: string | null
+          created_at: string | null
+          id: string
+          launch_site: string
+          launch_window_end: string | null
+          launch_window_start: string | null
+          mission_name: string
+          payload_mass: number | null
+          rocket_type: string | null
+          satellite_name: string
+          status: Database["public"]["Enums"]["launch_status"] | null
+          target_altitude: number
+          target_inclination: number
+          target_orbit: Database["public"]["Enums"]["orbit_type"]
+          trajectory_data: Json | null
+          updated_at: string | null
+        }
+        Insert: {
+          ai_recommendations?: string | null
+          collision_risk_assessment?: string | null
+          created_at?: string | null
+          id?: string
+          launch_site: string
+          launch_window_end?: string | null
+          launch_window_start?: string | null
+          mission_name: string
+          payload_mass?: number | null
+          rocket_type?: string | null
+          satellite_name: string
+          status?: Database["public"]["Enums"]["launch_status"] | null
+          target_altitude: number
+          target_inclination: number
+          target_orbit: Database["public"]["Enums"]["orbit_type"]
+          trajectory_data?: Json | null
+          updated_at?: string | null
+        }
+        Update: {
+          ai_recommendations?: string | null
+          collision_risk_assessment?: string | null
+          created_at?: string | null
+          id?: string
+          launch_site?: string
+          launch_window_end?: string | null
+          launch_window_start?: string | null
+          mission_name?: string
+          payload_mass?: number | null
+          rocket_type?: string | null
+          satellite_name?: string
+          status?: Database["public"]["Enums"]["launch_status"] | null
+          target_altitude?: number
+          target_inclination?: number
+          target_orbit?: Database["public"]["Enums"]["orbit_type"]
+          trajectory_data?: Json | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      satellites: {
+        Row: {
+          altitude: number
+          country: string | null
+          created_at: string | null
+          id: string
+          inclination: number
+          is_active: boolean | null
+          launch_date: string | null
+          name: string
+          norad_id: string | null
+          orbit_type: Database["public"]["Enums"]["orbit_type"]
+          position_x: number
+          position_y: number
+          position_z: number
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          tle_line1: string | null
+          tle_line2: string | null
+          updated_at: string | null
+          velocity: number
+        }
+        Insert: {
+          altitude: number
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          inclination: number
+          is_active?: boolean | null
+          launch_date?: string | null
+          name: string
+          norad_id?: string | null
+          orbit_type?: Database["public"]["Enums"]["orbit_type"]
+          position_x?: number
+          position_y?: number
+          position_z?: number
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          tle_line1?: string | null
+          tle_line2?: string | null
+          updated_at?: string | null
+          velocity: number
+        }
+        Update: {
+          altitude?: number
+          country?: string | null
+          created_at?: string | null
+          id?: string
+          inclination?: number
+          is_active?: boolean | null
+          launch_date?: string | null
+          name?: string
+          norad_id?: string | null
+          orbit_type?: Database["public"]["Enums"]["orbit_type"]
+          position_x?: number
+          position_y?: number
+          position_z?: number
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          tle_line1?: string | null
+          tle_line2?: string | null
+          updated_at?: string | null
+          velocity?: number
+        }
+        Relationships: []
+      }
+      solar_weather: {
+        Row: {
+          created_at: string | null
+          end_time: string | null
+          event_id: string | null
+          event_type: string
+          id: string
+          impact_assessment: string | null
+          intensity: string | null
+          linked_events: Json | null
+          source_location: string | null
+          start_time: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          end_time?: string | null
+          event_id?: string | null
+          event_type: string
+          id?: string
+          impact_assessment?: string | null
+          intensity?: string | null
+          linked_events?: Json | null
+          source_location?: string | null
+          start_time?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          end_time?: string | null
+          event_id?: string | null
+          event_type?: string
+          id?: string
+          impact_assessment?: string | null
+          intensity?: string | null
+          linked_events?: Json | null
+          source_location?: string | null
+          start_time?: string | null
+        }
+        Relationships: []
+      }
+      space_debris: {
+        Row: {
+          altitude: number
+          created_at: string | null
+          id: string
+          name: string | null
+          origin: string | null
+          position_x: number
+          position_y: number
+          position_z: number
+          size: string | null
+          velocity: number
+        }
+        Insert: {
+          altitude: number
+          created_at?: string | null
+          id?: string
+          name?: string | null
+          origin?: string | null
+          position_x?: number
+          position_y?: number
+          position_z?: number
+          size?: string | null
+          velocity: number
+        }
+        Update: {
+          altitude?: number
+          created_at?: string | null
+          id?: string
+          name?: string | null
+          origin?: string | null
+          position_x?: number
+          position_y?: number
+          position_z?: number
+          size?: string | null
+          velocity?: number
+        }
+        Relationships: []
+      }
+      system_alerts: {
+        Row: {
+          alert_type: Database["public"]["Enums"]["alert_type"]
+          created_at: string | null
+          id: string
+          is_dismissed: boolean | null
+          is_read: boolean | null
+          message: string
+          related_object_id: string | null
+          related_object_type: string | null
+          severity: Database["public"]["Enums"]["risk_level"]
+          title: string
+        }
+        Insert: {
+          alert_type: Database["public"]["Enums"]["alert_type"]
+          created_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          message: string
+          related_object_id?: string | null
+          related_object_type?: string | null
+          severity: Database["public"]["Enums"]["risk_level"]
+          title: string
+        }
+        Update: {
+          alert_type?: Database["public"]["Enums"]["alert_type"]
+          created_at?: string | null
+          id?: string
+          is_dismissed?: boolean | null
+          is_read?: boolean | null
+          message?: string
+          related_object_id?: string | null
+          related_object_type?: string | null
+          severity?: Database["public"]["Enums"]["risk_level"]
+          title?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +319,15 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      alert_type: "collision" | "debris" | "solar" | "launch" | "system"
+      launch_status:
+        | "planning"
+        | "scheduled"
+        | "launched"
+        | "completed"
+        | "aborted"
+      orbit_type: "LEO" | "MEO" | "GEO" | "HEO" | "SSO" | "POLAR"
+      risk_level: "safe" | "warning" | "critical"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +454,17 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      alert_type: ["collision", "debris", "solar", "launch", "system"],
+      launch_status: [
+        "planning",
+        "scheduled",
+        "launched",
+        "completed",
+        "aborted",
+      ],
+      orbit_type: ["LEO", "MEO", "GEO", "HEO", "SSO", "POLAR"],
+      risk_level: ["safe", "warning", "critical"],
+    },
   },
 } as const
