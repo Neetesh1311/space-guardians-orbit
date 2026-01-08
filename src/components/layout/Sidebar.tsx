@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Globe,
   Satellite,
@@ -25,7 +26,7 @@ const NavItem = ({ icon: Icon, label, isActive, badge, onClick }: NavItemProps) 
   <Button
     variant="ghost"
     className={cn(
-      'w-full justify-start gap-3 h-11 px-3 font-normal transition-all duration-200',
+      'w-full justify-start gap-3 h-11 px-3 font-normal transition-all duration-200 relative z-10',
       isActive && 'bg-primary/10 text-primary border-l-2 border-primary rounded-l-none'
     )}
     onClick={onClick}
@@ -51,6 +52,14 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleNav = (path: string) => {
+    navigate(path);
+    onClose();
+  };
+
   return (
     <>
       {/* Overlay for mobile */}
@@ -75,11 +84,11 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 mb-2">
               Monitoring
             </p>
-            <NavItem icon={Globe} label="Earth View" isActive />
-            <NavItem icon={Satellite} label="Satellites" badge={20} />
-            <NavItem icon={Orbit} label="Space Debris" badge={1842} />
-            <NavItem icon={AlertTriangle} label="Asteroids" badge={3} />
-            <NavItem icon={Zap} label="Solar Activity" />
+            <NavItem icon={Globe} label="Earth View" isActive={location.pathname === '/'} onClick={() => handleNav('/')} />
+            <NavItem icon={Satellite} label="Satellites" badge={350} onClick={() => handleNav('/')} />
+            <NavItem icon={Orbit} label="Space Debris" badge={1842} onClick={() => handleNav('/')} />
+            <NavItem icon={AlertTriangle} label="Asteroids" badge={3} onClick={() => handleNav('/')} />
+            <NavItem icon={Zap} label="Solar Activity" isActive={location.pathname === '/solar-activity'} onClick={() => handleNav('/solar-activity')} />
 
             <div className="py-3">
               <div className="h-px bg-border/50" />
@@ -88,16 +97,16 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 mb-2">
               Planning
             </p>
-            <NavItem icon={Rocket} label="Launch Planner" />
-            <NavItem icon={Layers} label="Orbit Designer" />
-            <NavItem icon={BarChart3} label="Analytics" />
+            <NavItem icon={Rocket} label="Launch Planner" isActive={location.pathname === '/launch-planner'} onClick={() => handleNav('/launch-planner')} />
+            <NavItem icon={Layers} label="Orbit Designer" onClick={() => handleNav('/')} />
+            <NavItem icon={BarChart3} label="Analytics" onClick={() => handleNav('/')} />
 
             <div className="py-3">
               <div className="h-px bg-border/50" />
             </div>
 
-            <NavItem icon={Settings} label="Settings" />
-            <NavItem icon={HelpCircle} label="Help & Docs" />
+            <NavItem icon={Settings} label="Settings" onClick={() => handleNav('/')} />
+            <NavItem icon={HelpCircle} label="Help & Docs" onClick={() => handleNav('/')} />
           </div>
 
           {/* Footer */}

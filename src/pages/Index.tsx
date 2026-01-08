@@ -7,7 +7,9 @@ import { AsteroidPanel } from '@/components/dashboard/AsteroidPanel';
 import { SatelliteList } from '@/components/dashboard/SatelliteList';
 import { AlertsPanel } from '@/components/dashboard/AlertsPanel';
 import { MissionClock } from '@/components/dashboard/MissionClock';
-import { useSatelliteData } from '@/hooks/useSatelliteData';
+import { SolarWeatherPanel } from '@/components/dashboard/SolarWeatherPanel';
+import { CollisionPredictionPanel } from '@/components/dashboard/CollisionPredictionPanel';
+import { useWorldSatellites } from '@/hooks/useWorldSatellites';
 import { useAsteroidData } from '@/hooks/useAsteroidData';
 import { 
   Satellite, 
@@ -18,7 +20,7 @@ import {
 
 const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { satellites, isLoading: satellitesLoading, stats: satelliteStats } = useSatelliteData();
+  const { satellites, isLoading: satellitesLoading, stats: satelliteStats } = useWorldSatellites();
   const { data: asteroids } = useAsteroidData();
 
   const hazardousAsteroids = asteroids?.filter(a => a.isPotentiallyHazardous).length || 0;
@@ -104,6 +106,19 @@ const Index = () => {
 
           {/* Secondary Content Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+            {/* AI Collision Prediction */}
+            <div className="h-[450px]">
+              <CollisionPredictionPanel satellites={satellites} />
+            </div>
+
+            {/* Solar Weather */}
+            <div className="h-[450px]">
+              <SolarWeatherPanel />
+            </div>
+          </div>
+
+          {/* Third Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
             {/* Asteroid Panel */}
             <div className="h-[400px]">
               <AsteroidPanel />
@@ -111,7 +126,7 @@ const Index = () => {
 
             {/* Satellite List */}
             <div className="h-[400px]">
-              <SatelliteList satellites={satellites} isLoading={satellitesLoading} />
+              <SatelliteList satellites={satellites.slice(0, 50)} isLoading={satellitesLoading} />
             </div>
           </div>
 
