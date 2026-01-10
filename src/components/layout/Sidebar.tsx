@@ -85,8 +85,8 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               Monitoring
             </p>
             <NavItem icon={Globe} label="Earth View" isActive={location.pathname === '/'} onClick={() => handleNav('/')} />
-            <NavItem icon={Satellite} label="Satellites" badge={350} onClick={() => handleNav('/')} />
-            <NavItem icon={Orbit} label="Space Debris" badge={1842} onClick={() => handleNav('/')} />
+            <NavItem icon={Satellite} label="Satellites" badge={390} isActive={location.pathname === '/satellites'} onClick={() => handleNav('/satellites')} />
+            <NavItem icon={Orbit} label="Space Debris" badge={98} isActive={location.pathname === '/space-debris'} onClick={() => handleNav('/space-debris')} />
             <NavItem icon={AlertTriangle} label="Asteroids" badge={3} onClick={() => handleNav('/')} />
             <NavItem icon={Zap} label="Solar Activity" isActive={location.pathname === '/solar-activity'} onClick={() => handleNav('/solar-activity')} />
 
@@ -95,10 +95,10 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             </div>
 
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 mb-2">
-              Planning
+              Simulation
             </p>
-            <NavItem icon={Rocket} label="Launch Planner" isActive={location.pathname === '/launch-planner'} onClick={() => handleNav('/launch-planner')} />
-            <NavItem icon={Layers} label="Orbit Designer" onClick={() => handleNav('/')} />
+            <NavItem icon={Rocket} label="Rocket Launch" isActive={location.pathname === '/rocket-launch'} onClick={() => handleNav('/rocket-launch')} />
+            <NavItem icon={Layers} label="Launch Planner" isActive={location.pathname === '/launch-planner'} onClick={() => handleNav('/launch-planner')} />
             <NavItem icon={BarChart3} label="Analytics" onClick={() => handleNav('/')} />
 
             <div className="py-3">
