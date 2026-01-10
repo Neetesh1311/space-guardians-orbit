@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { Footer } from '@/components/layout/Footer';
 import { EarthScene } from '@/components/space/EarthScene';
 import { StatsCard } from '@/components/dashboard/StatsCard';
 import { AsteroidPanel } from '@/components/dashboard/AsteroidPanel';
@@ -49,7 +50,7 @@ const Index = () => {
             />
             <StatsCard
               title="Tracked Debris"
-              value="23,847"
+              value={stats.debris?.total || 98}
               subtitle="Objects > 10cm"
               icon={Globe}
             />
@@ -130,18 +131,7 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Footer */}
-          <footer className="mt-8 pt-6 border-t border-border/50 text-center text-xs text-muted-foreground">
-            <p className="mb-2">
-              <span className="font-semibold text-foreground">SpaceShield</span> — Ultimate Space Traffic & Satellite Protection System
-            </p>
-            <p>
-              Developed by <span className="text-primary">Neetesh Kumar</span> • 
-              <a href="mailto:neeteshk1104@gmail.com" className="hover:text-primary transition-colors ml-1">neeteshk1104@gmail.com</a> • 
-              <a href="https://github.com/neetesh1541" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors ml-1">GitHub</a> • 
-              <a href="https://in.linkedin.com/in/neetesh-kumar-846616287" target="_blank" rel="noopener noreferrer" className="hover:text-primary transition-colors ml-1">LinkedIn</a>
-            </p>
-          </footer>
+          <Footer />
         </main>
       </div>
     </div>
