@@ -50,7 +50,7 @@ const Index = () => {
             />
             <StatsCard
               title="Tracked Debris"
-              value={stats.debris?.total || 98}
+              value={satelliteStats.debris?.total ?? 127}
               subtitle="Objects > 10cm"
               icon={Globe}
             />
