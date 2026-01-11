@@ -1,4 +1,4 @@
-import { useRef, useMemo, Suspense, useState } from 'react';
+import { useRef, useMemo, Suspense } from 'react';
 import { Canvas, useFrame, useLoader } from '@react-three/fiber';
 import { OrbitControls, Stars, Sphere, Html } from '@react-three/drei';
 import * as THREE from 'three';
@@ -7,9 +7,9 @@ import earthTexture from '@/assets/earth-texture.jpg';
 import type { Satellite } from '@/types/space';
 import { Globe } from 'lucide-react';
 
-interface EarthProps {
+interface SolarSystemProps {
   satellites: Satellite[];
-  showSolarSystem?: boolean;
+  showPlanets?: boolean;
 }
 
 // Moon Component
@@ -32,6 +32,7 @@ const Moon = () => {
         <sphereGeometry args={[0.27, 32, 32]} />
         <meshStandardMaterial color="#c4c4c4" roughness={0.8} metalness={0.1} />
       </mesh>
+      {/* Moon orbit ring */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[2.45, 2.55, 64]} />
         <meshBasicMaterial color="#888888" transparent opacity={0.1} side={THREE.DoubleSide} />
@@ -67,11 +68,13 @@ const Planet = ({ name, color, size, orbitRadius, orbitSpeed, hasRing, ringColor
 
   return (
     <group ref={orbitRef}>
+      {/* Orbit path */}
       <mesh rotation={[Math.PI / 2, 0, 0]}>
         <ringGeometry args={[orbitRadius - 0.02, orbitRadius + 0.02, 128]} />
         <meshBasicMaterial color={color} transparent opacity={0.15} side={THREE.DoubleSide} />
       </mesh>
       
+      {/* Planet */}
       <mesh 
         ref={planetRef} 
         position={[orbitRadius, 0, 0]}
@@ -95,17 +98,26 @@ const Planet = ({ name, color, size, orbitRadius, orbitSpeed, hasRing, ringColor
         )}
       </mesh>
 
+      {/* Ring for Saturn-like planets */}
       {hasRing && (
         <group position={[orbitRadius, 0, 0]} rotation={[Math.PI / 3, 0, 0]}>
           <mesh>
             <ringGeometry args={[size * 1.4, size * 2, 64]} />
-            <meshBasicMaterial color={ringColor || color} transparent opacity={0.4} side={THREE.DoubleSide} />
+            <meshBasicMaterial 
+              color={ringColor || color} 
+              transparent 
+              opacity={0.4} 
+              side={THREE.DoubleSide} 
+            />
           </mesh>
         </group>
       )}
     </group>
   );
 };
+
+// Import useState for hover effect
+import { useState } from 'react';
 
 // Sun Component
 const Sun = () => {
@@ -119,14 +131,20 @@ const Sun = () => {
 
   return (
     <group position={[-15, 2, -20]}>
+      {/* Sun glow */}
       <pointLight position={[0, 0, 0]} intensity={2} color="#ffd700" distance={50} />
       <mesh ref={sunRef}>
         <sphereGeometry args={[3, 64, 64]} />
         <meshBasicMaterial color="#ffd700" />
       </mesh>
+      {/* Corona effect */}
       <mesh>
         <sphereGeometry args={[3.5, 64, 64]} />
         <meshBasicMaterial color="#ff8c00" transparent opacity={0.3} />
+      </mesh>
+      <mesh>
+        <sphereGeometry args={[4, 64, 64]} />
+        <meshBasicMaterial color="#ff4500" transparent opacity={0.15} />
       </mesh>
     </group>
   );
@@ -151,8 +169,13 @@ const Earth = () => {
       <Sphere ref={earthRef} args={[1, 64, 64]}>
         <meshStandardMaterial map={texture} />
       </Sphere>
+      {/* Cloud layer */}
       <Sphere ref={cloudsRef} args={[1.01, 64, 64]}>
-        <meshStandardMaterial color="#ffffff" transparent opacity={0.12} />
+        <meshStandardMaterial 
+          color="#ffffff" 
+          transparent 
+          opacity={0.15}
+        />
       </Sphere>
     </group>
   );
@@ -162,10 +185,20 @@ const AtmosphereGlow = () => {
   return (
     <>
       <Sphere args={[1.02, 64, 64]}>
-        <meshBasicMaterial color="#4fc3f7" transparent opacity={0.15} side={THREE.BackSide} />
+        <meshBasicMaterial
+          color="#4fc3f7"
+          transparent
+          opacity={0.15}
+          side={THREE.BackSide}
+        />
       </Sphere>
       <Sphere args={[1.05, 64, 64]}>
-        <meshBasicMaterial color="#00bcd4" transparent opacity={0.08} side={THREE.BackSide} />
+        <meshBasicMaterial
+          color="#00bcd4"
+          transparent
+          opacity={0.08}
+          side={THREE.BackSide}
+        />
       </Sphere>
     </>
   );
@@ -221,24 +254,48 @@ const SatellitePoints = ({ satellites }: SatellitePointsProps) => {
   return (
     <points ref={pointsRef}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={satellites.length} array={positions} itemSize={3} />
-        <bufferAttribute attach="attributes-color" count={satellites.length} array={colors} itemSize={3} />
+        <bufferAttribute
+          attach="attributes-position"
+          count={satellites.length}
+          array={positions}
+          itemSize={3}
+        />
+        <bufferAttribute
+          attach="attributes-color"
+          count={satellites.length}
+          array={colors}
+          itemSize={3}
+        />
       </bufferGeometry>
-      <pointsMaterial size={0.05} vertexColors transparent opacity={0.9} sizeAttenuation />
+      <pointsMaterial
+        size={0.05}
+        vertexColors
+        transparent
+        opacity={0.9}
+        sizeAttenuation
+      />
     </points>
   );
 };
 
 const OrbitalRings = () => {
-  const ringColors = ['#4fc3f7', '#81c784', '#ffb74d'];
-  const radii = [1.15, 1.5, 2.0];
+  const ringConfigs = [
+    { radius: 1.15, color: '#4fc3f7', label: 'LEO' },
+    { radius: 1.5, color: '#81c784', label: 'MEO' },
+    { radius: 2.0, color: '#ffb74d', label: 'GEO' },
+  ];
 
   return (
     <>
-      {radii.map((radius, i) => (
+      {ringConfigs.map((ring, i) => (
         <mesh key={i} rotation={[Math.PI / 2 + (i * 0.1), 0, 0]}>
-          <ringGeometry args={[radius - 0.005, radius + 0.005, 128]} />
-          <meshBasicMaterial color={ringColors[i]} transparent opacity={0.2} side={THREE.DoubleSide} />
+          <ringGeometry args={[ring.radius - 0.005, ring.radius + 0.005, 128]} />
+          <meshBasicMaterial
+            color={ring.color}
+            transparent
+            opacity={0.2}
+            side={THREE.DoubleSide}
+          />
         </mesh>
       ))}
     </>
@@ -248,11 +305,11 @@ const OrbitalRings = () => {
 // Asteroid Belt
 const AsteroidBelt = () => {
   const asteroids = useMemo(() => {
-    return Array.from({ length: 150 }, (_, i) => ({
+    return Array.from({ length: 200 }, (_, i) => ({
       position: new THREE.Vector3(
-        Math.cos((i / 150) * Math.PI * 2) * (4 + Math.random() * 0.5),
+        Math.cos((i / 200) * Math.PI * 2) * (4 + Math.random() * 0.5),
         (Math.random() - 0.5) * 0.3,
-        Math.sin((i / 150) * Math.PI * 2) * (4 + Math.random() * 0.5)
+        Math.sin((i / 200) * Math.PI * 2) * (4 + Math.random() * 0.5)
       ),
       size: 0.01 + Math.random() * 0.02,
     }));
@@ -278,7 +335,7 @@ const AsteroidBelt = () => {
   );
 };
 
-const Scene = ({ satellites, showSolarSystem = false }: EarthProps) => {
+const Scene = ({ satellites, showPlanets = true }: SolarSystemProps) => {
   return (
     <>
       <ambientLight intensity={0.2} />
@@ -287,7 +344,7 @@ const Scene = ({ satellites, showSolarSystem = false }: EarthProps) => {
       
       <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1} />
       
-      {showSolarSystem && <Sun />}
+      {showPlanets && <Sun />}
       
       <Suspense fallback={null}>
         <Earth />
@@ -297,15 +354,20 @@ const Scene = ({ satellites, showSolarSystem = false }: EarthProps) => {
       <OrbitalRings />
       <SatellitePoints satellites={satellites} />
       
-      {showSolarSystem && (
+      {showPlanets && (
         <>
+          {/* Inner Planets */}
           <Planet name="Mercury" color="#b5b5b5" size={0.15} orbitRadius={5} orbitSpeed={0.08} />
           <Planet name="Venus" color="#e6c229" size={0.25} orbitRadius={6.5} orbitSpeed={0.06} />
           <Planet name="Mars" color="#cd5c5c" size={0.2} orbitRadius={8} orbitSpeed={0.04} />
+          
+          {/* Outer Planets */}
           <Planet name="Jupiter" color="#d4a574" size={0.6} orbitRadius={11} orbitSpeed={0.02} />
           <Planet name="Saturn" color="#f4d03f" size={0.5} orbitRadius={14} orbitSpeed={0.015} hasRing ringColor="#c9a227" />
           <Planet name="Uranus" color="#7fdbff" size={0.35} orbitRadius={17} orbitSpeed={0.01} hasRing ringColor="#5fb3b3" />
           <Planet name="Neptune" color="#4169e1" size={0.35} orbitRadius={20} orbitSpeed={0.008} />
+          
+          {/* Asteroid Belt */}
           <AsteroidBelt />
         </>
       )}
@@ -314,7 +376,7 @@ const Scene = ({ satellites, showSolarSystem = false }: EarthProps) => {
         enableZoom={true}
         enablePan={true}
         minDistance={1.5}
-        maxDistance={showSolarSystem ? 50 : 10}
+        maxDistance={showPlanets ? 50 : 10}
         autoRotate
         autoRotateSpeed={0.2}
       />
@@ -329,20 +391,20 @@ const LoadingFallback = () => (
         <div className="absolute inset-0 bg-primary/30 blur-2xl rounded-full animate-pulse" />
         <Globe className="h-16 w-16 text-primary relative animate-spin" style={{ animationDuration: '3s' }} />
       </div>
-      <p className="mt-4 text-sm text-muted-foreground">Loading Earth View...</p>
+      <p className="mt-4 text-sm text-muted-foreground">Loading Solar System...</p>
     </div>
   </div>
 );
 
-export const EarthScene = ({ satellites, showSolarSystem = false }: EarthProps) => {
+export const SolarSystem = ({ satellites, showPlanets = true }: SolarSystemProps) => {
   return (
     <div className="w-full h-full relative">
       <Suspense fallback={<LoadingFallback />}>
         <Canvas
-          camera={{ position: showSolarSystem ? [0, 5, 15] : [0, 0, 3], fov: 45 }}
+          camera={{ position: showPlanets ? [0, 5, 15] : [0, 0, 3], fov: 45 }}
           gl={{ antialias: true, alpha: true }}
         >
-          <Scene satellites={satellites} showSolarSystem={showSolarSystem} />
+          <Scene satellites={satellites} showPlanets={showPlanets} />
         </Canvas>
       </Suspense>
     </div>
