@@ -10,6 +10,7 @@ import { AlertsPanel } from '@/components/dashboard/AlertsPanel';
 import { MissionClock } from '@/components/dashboard/MissionClock';
 import { SolarWeatherPanel } from '@/components/dashboard/SolarWeatherPanel';
 import { CollisionPredictionPanel } from '@/components/dashboard/CollisionPredictionPanel';
+import { CollisionAlertBanner } from '@/components/dashboard/CollisionAlertBanner';
 import { PlanetaryDataPanel } from '@/components/dashboard/PlanetaryDataPanel';
 import { SpaceMissionsPanel } from '@/components/dashboard/SpaceMissionsPanel';
 import { ISSTrackerPanel } from '@/components/dashboard/ISSTrackerPanel';
@@ -45,6 +46,14 @@ const Index = () => {
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         
         <main className="flex-1 p-4 md:p-6 overflow-x-hidden">
+          {/* AI Collision Alert Banner */}
+          <div className="mb-4">
+            <CollisionAlertBanner 
+              satellites={satellites}
+              autoAnalyze={false}
+            />
+          </div>
+
           {/* Mission Clock */}
           <div className="mb-6">
             <MissionClock />
