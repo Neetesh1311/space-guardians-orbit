@@ -9,6 +9,9 @@ import SolarActivity from "./pages/SolarActivity";
 import Satellites from "./pages/Satellites";
 import SpaceDebris from "./pages/SpaceDebris";
 import RocketLaunch from "./pages/RocketLaunch";
+import SolarSystem from "./pages/SolarSystem";
+import HelpDocs from "./pages/HelpDocs";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +29,9 @@ const App = () => (
           <Route path="/satellites" element={<Satellites />} />
           <Route path="/space-debris" element={<SpaceDebris />} />
           <Route path="/rocket-launch" element={<RocketLaunch />} />
+          <Route path="/solar-system" element={<SolarSystem />} />
+          <Route path="/help-docs" element={<HelpDocs />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
