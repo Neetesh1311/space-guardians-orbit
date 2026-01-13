@@ -2,14 +2,17 @@ import { useState } from 'react';
 import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Footer } from '@/components/layout/Footer';
-import { EarthScene } from '@/components/space/EarthScene';
+import { InteractiveEarthScene } from '@/components/space/InteractiveEarthScene';
 import { PlanetaryDataPanel } from '@/components/dashboard/PlanetaryDataPanel';
 import { SpaceMissionsPanel } from '@/components/dashboard/SpaceMissionsPanel';
+import { CollisionPredictionPanel } from '@/components/dashboard/CollisionPredictionPanel';
+import { CollisionAlertBanner } from '@/components/dashboard/CollisionAlertBanner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { useWorldSatellites } from '@/hooks/useWorldSatellites';
-import { Orbit, Sun, Moon as MoonIcon, Globe, Rocket, Star } from 'lucide-react';
+import { Orbit, Sun, Moon as MoonIcon, Globe, Rocket, Star, AlertTriangle, Brain, Radar } from 'lucide-react';
 
 const SOLAR_SYSTEM_FACTS = [
   { label: 'Age', value: '4.6 billion years' },
@@ -22,7 +25,8 @@ const SOLAR_SYSTEM_FACTS = [
 
 const SolarSystem = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { satellites } = useWorldSatellites();
+  const [showCollisionPanel, setShowCollisionPanel] = useState(false);
+  const { satellites, stats } = useWorldSatellites();
 
   return (
     <div className="min-h-screen bg-background stars-bg">
@@ -32,17 +36,42 @@ const SolarSystem = () => {
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         
         <main className="flex-1 p-4 md:p-6 overflow-x-hidden">
+          {/* AI Collision Alert Banner */}
+          <div className="mb-4">
+            <CollisionAlertBanner 
+              satellites={satellites}
+              autoAnalyze={false}
+              onViewDetails={() => setShowCollisionPanel(true)}
+            />
+          </div>
+
           {/* Page Header */}
           <div className="mb-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-primary/20">
-                <Orbit className="h-6 w-6 text-primary" />
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-primary/20">
+                  <Orbit className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold">Solar System Explorer</h1>
+                  <p className="text-sm text-muted-foreground">
+                    Interactive 3D view with real-time satellite tracking and AI collision prediction
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold">Solar System Explorer</h1>
-                <p className="text-sm text-muted-foreground">
-                  Interactive 3D view of our solar system with real planetary data
-                </p>
+              <div className="flex items-center gap-2">
+                <Badge variant="outline" className="hidden md:flex">
+                  <Radar className="h-3 w-3 mr-1" />
+                  {satellites.length} Active Objects
+                </Badge>
+                <Button 
+                  variant={showCollisionPanel ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setShowCollisionPanel(!showCollisionPanel)}
+                >
+                  <Brain className="h-4 w-4 mr-1" />
+                  AI Analysis
+                </Button>
               </div>
             </div>
           </div>
@@ -62,8 +91,8 @@ const SolarSystem = () => {
           {/* Main Content */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* 3D Solar System View */}
-            <div className="lg:col-span-2 h-[600px] rounded-xl overflow-hidden border border-border/50 bg-card/30 backdrop-blur relative">
-              <EarthScene satellites={satellites} showSolarSystem={true} />
+            <div className={`${showCollisionPanel ? 'lg:col-span-2' : 'lg:col-span-2'} h-[600px] rounded-xl overflow-hidden border border-border/50 bg-card/30 backdrop-blur relative`}>
+              <InteractiveEarthScene satellites={satellites} showSolarSystem={true} />
               
               {/* Info Overlay */}
               <div className="absolute top-4 left-4">
@@ -73,7 +102,7 @@ const SolarSystem = () => {
                 </Badge>
               </div>
 
-              <div className="absolute bottom-4 left-4 right-4">
+              <div className="absolute bottom-4 left-4 right-80">
                 <div className="glass-panel px-4 py-3">
                   <div className="flex flex-wrap gap-4 text-xs">
                     <div className="flex items-center gap-2">
@@ -95,11 +124,35 @@ const SolarSystem = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Risk Status Overlay */}
+              <div className="absolute bottom-4 right-4">
+                <div className="glass-panel px-3 py-2">
+                  <div className="flex items-center gap-3 text-xs">
+                    <div className="flex items-center gap-1">
+                      <span className="h-2 w-2 rounded-full bg-success" />
+                      <span>{stats.safe}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="h-2 w-2 rounded-full bg-warning" />
+                      <span>{stats.warning}</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="h-2 w-2 rounded-full bg-destructive" />
+                      <span>{stats.critical}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            {/* Planetary Data */}
+            {/* Right Panel - Either Collision Analysis or Planetary Data */}
             <div className="h-[600px]">
-              <PlanetaryDataPanel />
+              {showCollisionPanel ? (
+                <CollisionPredictionPanel satellites={satellites} />
+              ) : (
+                <PlanetaryDataPanel />
+              )}
             </div>
           </div>
 
