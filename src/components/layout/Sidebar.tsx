@@ -12,6 +12,7 @@ import {
   HelpCircle,
   Layers,
   Zap,
+  Sun,
 } from 'lucide-react';
 
 interface NavItemProps {
@@ -80,15 +81,24 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       >
         <div className="flex flex-col h-full pt-16 md:pt-4">
           {/* Main Navigation */}
-          <div className="flex-1 p-3 space-y-1">
+          <div className="flex-1 p-3 space-y-1 overflow-y-auto">
             <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 mb-2">
               Monitoring
             </p>
             <NavItem icon={Globe} label="Earth View" isActive={location.pathname === '/'} onClick={() => handleNav('/')} />
             <NavItem icon={Satellite} label="Satellites" badge={390} isActive={location.pathname === '/satellites'} onClick={() => handleNav('/satellites')} />
             <NavItem icon={Orbit} label="Space Debris" badge={98} isActive={location.pathname === '/space-debris'} onClick={() => handleNav('/space-debris')} />
-            <NavItem icon={AlertTriangle} label="Asteroids" badge={3} onClick={() => handleNav('/')} />
+            <NavItem icon={AlertTriangle} label="Asteroids" badge={3} isActive={location.pathname === '/'} onClick={() => handleNav('/')} />
             <NavItem icon={Zap} label="Solar Activity" isActive={location.pathname === '/solar-activity'} onClick={() => handleNav('/solar-activity')} />
+
+            <div className="py-3">
+              <div className="h-px bg-border/50" />
+            </div>
+
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 mb-2">
+              Exploration
+            </p>
+            <NavItem icon={Sun} label="Solar System" isActive={location.pathname === '/solar-system'} onClick={() => handleNav('/solar-system')} />
 
             <div className="py-3">
               <div className="h-px bg-border/50" />
@@ -99,14 +109,17 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             </p>
             <NavItem icon={Rocket} label="Rocket Launch" isActive={location.pathname === '/rocket-launch'} onClick={() => handleNav('/rocket-launch')} />
             <NavItem icon={Layers} label="Launch Planner" isActive={location.pathname === '/launch-planner'} onClick={() => handleNav('/launch-planner')} />
-            <NavItem icon={BarChart3} label="Analytics" onClick={() => handleNav('/')} />
+            <NavItem icon={BarChart3} label="Analytics" isActive={location.pathname === '/'} onClick={() => handleNav('/')} />
 
             <div className="py-3">
               <div className="h-px bg-border/50" />
             </div>
 
-            <NavItem icon={Settings} label="Settings" onClick={() => handleNav('/')} />
-            <NavItem icon={HelpCircle} label="Help & Docs" onClick={() => handleNav('/')} />
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground px-3 mb-2">
+              System
+            </p>
+            <NavItem icon={Settings} label="Settings" isActive={location.pathname === '/settings'} onClick={() => handleNav('/settings')} />
+            <NavItem icon={HelpCircle} label="Help & Docs" isActive={location.pathname === '/help-docs'} onClick={() => handleNav('/help-docs')} />
           </div>
 
           {/* Footer */}
