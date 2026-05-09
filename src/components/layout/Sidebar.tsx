@@ -129,7 +129,18 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
               <p className="text-[10px] text-muted-foreground mb-2">
                 Unlock AI predictions & advanced simulations
               </p>
-              <Button variant="glow" size="sm" className="w-full text-xs">
+              <Button
+                variant="glow"
+                size="sm"
+                className="w-full text-xs"
+                onClick={() => {
+                  import('sonner').then(({ toast }) =>
+                    toast.success('Pro plan request received! 🚀', {
+                      description: "We'll contact you at neeteshk1104@gmail.com",
+                    })
+                  );
+                }}
+              >
                 Upgrade Now
               </Button>
             </div>
