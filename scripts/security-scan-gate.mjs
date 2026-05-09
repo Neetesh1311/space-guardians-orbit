@@ -16,7 +16,7 @@ const run = (cmd, args, options = {}) => {
 
 const listChangedMigrations = () => {
   if (!hasGit) return [];
-  const refsToTry = [`origin/${baseRef}...HEAD`, `${baseRef}...HEAD`, 'HEAD~1...HEAD'];
+  const refsToTry = process.env.CI ? [`origin/${baseRef}...HEAD`, `${baseRef}...HEAD`] : [];
   for (const range of refsToTry) {
     try {
       const output = run('git', ['diff', '--name-only', range, '--', 'supabase/migrations']);
@@ -27,7 +27,9 @@ const listChangedMigrations = () => {
     }
   }
   try {
-    return run('git', ['ls-files', 'supabase/migrations']).split('\n').filter((file) => file.endsWith('.sql'));
+    const unstaged = run('git', ['diff', '--name-only', '--', 'supabase/migrations']);
+    const staged = run('git', ['diff', '--cached', '--name-only', '--', 'supabase/migrations']);
+    return [...new Set(`${unstaged}\n${staged}`.split('\n').filter((file) => file.endsWith('.sql')))];
   } catch {
     return [];
   }
