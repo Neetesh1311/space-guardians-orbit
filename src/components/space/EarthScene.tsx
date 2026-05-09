@@ -287,7 +287,7 @@ const Scene = ({ satellites, showSolarSystem = false }: EarthProps) => {
       
       <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1} />
       
-      {showSolarSystem && <Sun />}
+      {showSolarSystem && <RealisticSun />}
       
       <Suspense fallback={null}>
         <Earth />

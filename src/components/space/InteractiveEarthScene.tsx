@@ -358,7 +358,7 @@ const Scene = ({
       
       <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={isPaused ? 0 : 1} />
       
-      {showSolarSystem && <Sun isPaused={isPaused} orbitSpeed={orbitSpeed} />}
+      {showSolarSystem && <RealisticSun />}
       
       <Suspense fallback={null}>
         <Earth isPaused={isPaused} orbitSpeed={orbitSpeed} />
