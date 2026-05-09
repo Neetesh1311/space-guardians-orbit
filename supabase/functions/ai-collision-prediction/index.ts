@@ -144,21 +144,21 @@ Provide collision predictions and risk assessment.`;
 
     if (!response.ok) {
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limits exceeded, please try again later." }), {
-          status: 429,
+        return new Response(JSON.stringify(baseline), {
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Payment required, please add funds to your Lovable AI workspace." }), {
-          status: 402,
+        return new Response(JSON.stringify(baseline), {
+          status: 200,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const errorText = await response.text();
       console.error("AI gateway error:", response.status, errorText);
-      return new Response(JSON.stringify({ error: "AI gateway error" }), {
-        status: 500,
+      return new Response(JSON.stringify(baseline), {
+        status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -175,12 +175,7 @@ Provide collision predictions and risk assessment.`;
       predictions = JSON.parse(jsonStr);
     } catch (parseError) {
       console.error("Failed to parse AI response:", parseError);
-      predictions = {
-        predictions: [],
-        overall_risk_assessment: "Unable to parse prediction data",
-        kessler_risk: "low",
-        summary: content
-      };
+      predictions = baseline;
     }
 
     return new Response(JSON.stringify(predictions), {
