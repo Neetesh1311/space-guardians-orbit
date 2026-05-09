@@ -9,15 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Search, 
-  Trash2,
-  AlertTriangle,
-  Gauge,
-  Globe2,
-  Filter,
-  Info
-} from 'lucide-react';
+import { KesslerAnalysisPanel } from '@/components/dashboard/KesslerAnalysisPanel';
+import { Search, Trash2, AlertTriangle, Gauge, Globe2, Filter, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const SpaceDebris = () => {
