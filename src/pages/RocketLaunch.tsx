@@ -194,29 +194,46 @@ const LaunchPad = () => {
 };
 
 const Scene = ({ phase, isLaunched, time }: RocketProps) => {
+  // Sky color shifts from blue → black as we ascend (driven by phase)
+  const skyColor = phase >= 4 ? '#000010' : phase >= 2 ? '#0a1530' : phase >= 1 ? '#1a3a6b' : '#3a7bd5';
+
   return (
     <>
-      <ambientLight intensity={0.3} />
-      <directionalLight position={[5, 10, 5]} intensity={1} />
+      <color attach="background" args={[skyColor]} />
+      <fog attach="fog" args={[skyColor, 15, 60]} />
+      <ambientLight intensity={0.4} />
+      <directionalLight position={[5, 10, 5]} intensity={1.2} castShadow />
       <pointLight position={[-5, 5, -5]} intensity={0.5} color="#4fc3f7" />
-      
-      <Stars radius={100} depth={50} count={3000} factor={4} saturation={0} fade speed={1} />
-      
+      <hemisphereLight args={[skyColor, '#1a1a2e', 0.6]} />
+
+      <Stars radius={100} depth={50} count={phase >= 3 ? 6000 : 2000} factor={4} saturation={0} fade speed={1} />
+
       <RocketBody phase={phase} isLaunched={isLaunched} time={time} />
       <LaunchPad />
-      
-      {/* Ground */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3.15, 0]}>
-        <planeGeometry args={[50, 50]} />
-        <meshStandardMaterial color="#1a1a2e" />
+
+      {/* Earth horizon curve visible from high altitude */}
+      {phase >= 4 && (
+        <mesh position={[0, -25, -20]}>
+          <sphereGeometry args={[20, 64, 32]} />
+          <meshStandardMaterial color="#1e6091" emissive="#0a3050" emissiveIntensity={0.3} />
+        </mesh>
+      )}
+
+      {/* Ground (terrain) */}
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -3.15, 0]} receiveShadow>
+        <planeGeometry args={[80, 80]} />
+        <meshStandardMaterial color="#1a1a2e" roughness={0.9} />
       </mesh>
 
-      <OrbitControls 
-        enablePan={false}
-        minDistance={3}
-        maxDistance={15}
-        target={[0, 0, 0]}
-      />
+      {/* Launch pad lights */}
+      {!isLaunched && (
+        <>
+          <pointLight position={[2, -2, 2]} intensity={0.6} color="#4fc3f7" distance={5} />
+          <pointLight position={[-2, -2, -2]} intensity={0.6} color="#ff6b1a" distance={5} />
+        </>
+      )}
+
+      <OrbitControls enablePan={false} minDistance={3} maxDistance={20} target={[0, 0, 0]} />
     </>
   );
 };

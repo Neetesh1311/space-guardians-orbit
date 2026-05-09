@@ -107,30 +107,8 @@ const Planet = ({ name, color, size, orbitRadius, orbitSpeed, hasRing, ringColor
   );
 };
 
-// Sun Component
-const Sun = () => {
-  const sunRef = useRef<THREE.Mesh>(null);
-
-  useFrame(() => {
-    if (sunRef.current) {
-      sunRef.current.rotation.y += 0.001;
-    }
-  });
-
-  return (
-    <group position={[-15, 2, -20]}>
-      <pointLight position={[0, 0, 0]} intensity={2} color="#ffd700" distance={50} />
-      <mesh ref={sunRef}>
-        <sphereGeometry args={[3, 64, 64]} />
-        <meshBasicMaterial color="#ffd700" />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[3.5, 64, 64]} />
-        <meshBasicMaterial color="#ff8c00" transparent opacity={0.3} />
-      </mesh>
-    </group>
-  );
-};
+// Realistic Sun (multi-layer animated corona)
+import { RealisticSun } from './RealisticSun';
 
 const Earth = () => {
   const earthRef = useRef<THREE.Mesh>(null);
@@ -287,7 +265,7 @@ const Scene = ({ satellites, showSolarSystem = false }: EarthProps) => {
       
       <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1} />
       
-      {showSolarSystem && <Sun />}
+      {showSolarSystem && <RealisticSun />}
       
       <Suspense fallback={null}>
         <Earth />

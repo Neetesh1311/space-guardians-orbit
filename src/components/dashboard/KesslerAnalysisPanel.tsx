@@ -1,0 +1,107 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Shield, AlertTriangle, Activity, Zap, TrendingUp } from 'lucide-react';
+import { useMemo } from 'react';
+
+interface KesslerAnalysisPanelProps {
+  totalDebris: number;
+  highRisk: number;
+  mediumRisk: number;
+}
+
+export const KesslerAnalysisPanel = ({ totalDebris, highRisk, mediumRisk }: KesslerAnalysisPanelProps) => {
+  // Simple heuristic Kessler index 0–100
+  const { kesslerIndex, level, label } = useMemo(() => {
+    const density = Math.min((totalDebris / 200) * 30, 30);
+    const risk = Math.min(((highRisk * 4 + mediumRisk * 1.5) / Math.max(totalDebris, 1)) * 100, 70);
+    const idx = Math.min(Math.round(density + risk), 100);
+    let lvl: 'low' | 'medium' | 'high' | 'critical' = 'low';
+    let lbl = 'Stable';
+    if (idx >= 80) { lvl = 'critical'; lbl = 'Cascade Imminent'; }
+    else if (idx >= 60) { lvl = 'high'; lbl = 'Elevated'; }
+    else if (idx >= 35) { lvl = 'medium'; lbl = 'Watch'; }
+    return { kesslerIndex: idx, level: lvl, label: lbl };
+  }, [totalDebris, highRisk, mediumRisk]);
+
+  const colorClass = {
+    low: 'text-success border-success/40 bg-success/10',
+    medium: 'text-warning border-warning/40 bg-warning/10',
+    high: 'text-warning border-warning/50 bg-warning/15',
+    critical: 'text-destructive border-destructive/50 bg-destructive/15',
+  }[level];
+
+  // Maneuver / delta-v suggestions for the worst debris families
+  const maneuvers = [
+    { burn: 'Prograde +5 m/s', dv: 5, when: 'T+0:00 next ascending node', purpose: 'Raise apogee 8 km clear of LEO crowd' },
+    { burn: 'Retrograde -3 m/s', dv: 3, when: 'T+0:42 perigee', purpose: 'Phase shift to avoid Cosmos-1408 fragments' },
+    { burn: 'Normal +1.2 m/s', dv: 1.2, when: 'T+1:18 high-latitude crossing', purpose: 'Inclination tweak for Iridium-33 debris cloud' },
+  ];
+
+  return (
+    <Card className="glass-panel">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-base flex items-center gap-2">
+          <Shield className="h-5 w-5 text-primary" />
+          Kessler Syndrome Analysis
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className={`rounded-lg border p-4 ${colorClass}`}>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs uppercase tracking-wider opacity-80">Cascade Risk Index</span>
+            <Badge variant="outline" className="font-mono">{label}</Badge>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-4xl font-bold font-mono">{kesslerIndex}</span>
+            <span className="text-sm opacity-70">/ 100</span>
+          </div>
+          <Progress value={kesslerIndex} className="mt-3 h-2" />
+          <p className="text-[11px] mt-3 opacity-80">
+            Based on {totalDebris} tracked objects, with {highRisk} high-risk and {mediumRisk} medium-risk
+            elements. Index combines orbital density and impact probability.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="rounded-lg bg-secondary/40 p-2">
+            <Activity className="h-4 w-4 mx-auto text-primary mb-1" />
+            <p className="text-[10px] text-muted-foreground">Density</p>
+            <p className="text-sm font-mono font-bold">{(totalDebris / 1000).toFixed(2)}/km³</p>
+          </div>
+          <div className="rounded-lg bg-secondary/40 p-2">
+            <TrendingUp className="h-4 w-4 mx-auto text-warning mb-1" />
+            <p className="text-[10px] text-muted-foreground">Growth/yr</p>
+            <p className="text-sm font-mono font-bold">+4.7%</p>
+          </div>
+          <div className="rounded-lg bg-secondary/40 p-2">
+            <AlertTriangle className="h-4 w-4 mx-auto text-destructive mb-1" />
+            <p className="text-[10px] text-muted-foreground">Conjunctions</p>
+            <p className="text-sm font-mono font-bold">{highRisk + Math.floor(mediumRisk / 3)}</p>
+          </div>
+        </div>
+
+        <div>
+          <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1">
+            <Zap className="h-3 w-3" /> Recommended Avoidance Maneuvers
+          </p>
+          <div className="space-y-2">
+            {maneuvers.map((m, i) => (
+              <div key={i} className="rounded-lg border border-border/50 bg-secondary/20 p-2.5">
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-mono text-sm font-bold text-primary">{m.burn}</span>
+                  <Badge variant="outline" className="text-[10px]">Δv {m.dv} m/s</Badge>
+                </div>
+                <p className="text-[11px] text-muted-foreground">⏱ {m.when}</p>
+                <p className="text-[11px] mt-0.5">{m.purpose}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-muted-foreground mt-2 italic">
+            Total mission Δv budget: {maneuvers.reduce((s, m) => s + m.dv, 0).toFixed(1)} m/s — within nominal limits.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};

@@ -9,15 +9,8 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
-import { 
-  Search, 
-  Trash2,
-  AlertTriangle,
-  Gauge,
-  Globe2,
-  Filter,
-  Info
-} from 'lucide-react';
+import { KesslerAnalysisPanel } from '@/components/dashboard/KesslerAnalysisPanel';
+import { Search, Trash2, AlertTriangle, Gauge, Globe2, Filter, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const SpaceDebris = () => {
@@ -115,6 +108,15 @@ const SpaceDebris = () => {
                 <p className="text-xs text-muted-foreground mt-1">{mediumRiskPercent.toFixed(1)}% of total</p>
               </CardContent>
             </Card>
+          </div>
+
+          {/* Kessler Analysis */}
+          <div className="mb-6">
+            <KesslerAnalysisPanel
+              totalDebris={totalDebris}
+              highRisk={stats.debris.high}
+              mediumRisk={stats.debris.medium}
+            />
           </div>
 
           {/* Info Banner */}
