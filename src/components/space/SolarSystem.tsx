@@ -316,7 +316,7 @@ const Scene = ({ satellites, showPlanets = true }: SolarSystemProps) => {
       
       <Stars radius={100} depth={50} count={8000} factor={4} saturation={0} fade speed={1} />
       
-      {showPlanets && <Sun />}
+      {showPlanets && <RealisticSun />}
       
       <Suspense fallback={null}>
         <Earth />
