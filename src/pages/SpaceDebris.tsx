@@ -122,6 +122,28 @@ const SpaceDebris = () => {
             />
           </div>
 
+          <Card className="glass-panel mb-6">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg flex items-center justify-between">
+                <span>Orbital Debris Density Heatmap</span>
+                <Badge variant="outline" className="border-primary/40 text-primary">T+{timeOffset} min</Badge>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="h-[420px]">
+                <DebrisDensityHeatmap3D debris={filteredDebris} timeOffset={timeOffset} selectedRisk={selectedRisk} />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-3 items-center">
+                <Slider value={[timeOffset]} min={0} max={180} step={5} onValueChange={([value]) => setTimeOffset(value)} />
+                <div className="flex gap-2 text-xs">
+                  <Badge className="bg-success/20 text-success border-success/30">Low</Badge>
+                  <Badge className="bg-warning/20 text-warning border-warning/30">Medium</Badge>
+                  <Badge className="bg-destructive/20 text-destructive border-destructive/30">High</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Info Banner */}
           <Card className="glass-panel mb-6 border-warning/30 bg-warning/5">
             <CardContent className="p-4 flex items-start gap-3">
