@@ -30,6 +30,7 @@ const ISS_CREW: CrewMember[] = [
 ];
 
 export const ISSTrackerPanel = () => {
+  const orbitStartedAt = useState(() => Date.now())[0];
   const [issData, setIssData] = useState<ISSData>({
     latitude: 0,
     longitude: 0,
@@ -45,17 +46,17 @@ export const ISSTrackerPanel = () => {
     const interval = setInterval(() => {
       setIssData(prev => ({
         ...prev,
-        latitude: (prev.latitude + 0.5) % 180 - 90,
-        longitude: (prev.longitude + 1.5) % 360 - 180,
+        latitude: Math.sin((Date.now() - orbitStartedAt) / 1000 / 5520 * Math.PI * 2) * 51.6,
+        longitude: ((((Date.now() - orbitStartedAt) / 1000 / 5520) * 360 + 540) % 360) - 180,
         altitude: 408 + Math.random() * 12,
         velocity: 27550 + Math.random() * 100,
         timestamp: new Date(),
       }));
-      setOrbitProgress(prev => (prev + 1) % 100);
+      setOrbitProgress(Math.floor((((Date.now() - orbitStartedAt) / 1000) % 5520) / 5520 * 100));
     }, 2000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [orbitStartedAt]);
 
   const formatCoord = (val: number, isLat: boolean) => {
     const dir = isLat 
