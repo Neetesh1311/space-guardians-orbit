@@ -154,31 +154,8 @@ const Planet = ({
   );
 };
 
-// Sun Component
-const Sun = ({ isPaused, orbitSpeed }: { isPaused: boolean; orbitSpeed: number }) => {
-  const sunRef = useRef<THREE.Mesh>(null);
-
-  useFrame(() => {
-    if (isPaused) return;
-    if (sunRef.current) {
-      sunRef.current.rotation.y += 0.001 * orbitSpeed;
-    }
-  });
-
-  return (
-    <group position={[-15, 2, -20]}>
-      <pointLight position={[0, 0, 0]} intensity={2} color="#ffd700" distance={50} />
-      <mesh ref={sunRef}>
-        <sphereGeometry args={[3, 64, 64]} />
-        <meshBasicMaterial color="#ffd700" />
-      </mesh>
-      <mesh>
-        <sphereGeometry args={[3.5, 64, 64]} />
-        <meshBasicMaterial color="#ff8c00" transparent opacity={0.3} />
-      </mesh>
-    </group>
-  );
-};
+// Realistic Sun (multi-layer animated corona)
+import { RealisticSun } from './RealisticSun';
 
 const Earth = ({ isPaused, orbitSpeed }: { isPaused: boolean; orbitSpeed: number }) => {
   const earthRef = useRef<THREE.Mesh>(null);
