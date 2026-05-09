@@ -10,6 +10,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Progress } from '@/components/ui/progress';
 import { KesslerAnalysisPanel } from '@/components/dashboard/KesslerAnalysisPanel';
+import { DebrisDensityHeatmap3D } from '@/components/space/DebrisDensityHeatmap3D';
+import { Slider } from '@/components/ui/slider';
 import { Search, Trash2, AlertTriangle, Gauge, Globe2, Filter, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -18,6 +20,7 @@ const SpaceDebris = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedRisk, setSelectedRisk] = useState<string>('all');
   const [selectedSize, setSelectedSize] = useState<string>('all');
+  const [timeOffset, setTimeOffset] = useState(0);
   const { spaceDebris, stats } = useWorldSatellites();
 
   const filteredDebris = useMemo(() => {
@@ -50,8 +53,8 @@ const SpaceDebris = () => {
   };
 
   const totalDebris = stats.debris.total;
-  const highRiskPercent = (stats.debris.high / totalDebris) * 100;
-  const mediumRiskPercent = (stats.debris.medium / totalDebris) * 100;
+  const highRiskPercent = totalDebris > 0 ? (stats.debris.high / totalDebris) * 100 : 0;
+  const mediumRiskPercent = totalDebris > 0 ? (stats.debris.medium / totalDebris) * 100 : 0;
 
   return (
     <div className="min-h-screen bg-background stars-bg">
