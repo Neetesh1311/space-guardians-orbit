@@ -30,7 +30,6 @@ const Satellites = () => {
   const [selectedCountry, setSelectedCountry] = useState<string>('all');
   const [selectedSatelliteId, setSelectedSatelliteId] = useState<string | null>(null);
   const { satellites, stats, isLoading } = useWorldSatellites();
-  const selectedSatellite = satellites.find((sat) => sat.id === selectedSatelliteId) ?? filteredSatellites[0] ?? null;
 
   const filteredSatellites = useMemo(() => {
     return satellites.filter(sat => {
@@ -53,6 +52,7 @@ const Satellites = () => {
       return matchesSearch && matchesOrbit && matchesCountry;
     });
   }, [satellites, searchQuery, selectedOrbit, selectedCountry]);
+  const selectedSatellite = satellites.find((sat) => sat.id === selectedSatelliteId) ?? filteredSatellites[0] ?? null;
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
