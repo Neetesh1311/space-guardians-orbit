@@ -6,6 +6,14 @@ export interface Satellite {
   inclination: number; // degrees
   velocity: number; // km/s
   riskLevel: 'safe' | 'warning' | 'critical';
+  launchDate?: string;
+  operator?: string;
+  mission?: string;
+  mass?: number;
+  power?: number;
+  designLife?: number;
+  launchVehicle?: string;
+  country?: string;
   position: {
     x: number;
     y: number;

@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SatelliteDetailPanel } from '@/components/dashboard/SatelliteDetailPanel';
 import { 
   Search, 
   Satellite, 
@@ -27,6 +28,7 @@ const Satellites = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrbit, setSelectedOrbit] = useState<string>('all');
   const [selectedCountry, setSelectedCountry] = useState<string>('all');
+  const [selectedSatelliteId, setSelectedSatelliteId] = useState<string | null>(null);
   const { satellites, stats, isLoading } = useWorldSatellites();
 
   const filteredSatellites = useMemo(() => {
@@ -50,6 +52,7 @@ const Satellites = () => {
       return matchesSearch && matchesOrbit && matchesCountry;
     });
   }, [satellites, searchQuery, selectedOrbit, selectedCountry]);
+  const selectedSatellite = satellites.find((sat) => sat.id === selectedSatelliteId) ?? filteredSatellites[0] ?? null;
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -190,6 +193,7 @@ const Satellites = () => {
           </Card>
 
           {/* Results */}
+          <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6">
           <Card className="glass-panel">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center justify-between">
@@ -205,8 +209,12 @@ const Satellites = () => {
                       key={sat.id} 
                       className={cn(
                         "bg-secondary/30 border-border/50 hover:border-primary/50 transition-all duration-300",
+                        selectedSatelliteId === sat.id && 'border-primary/70 glow-border',
                         sat.name.includes('GSAT') || sat.name.includes('INSAT') || sat.name.includes('IRNSS') || sat.name.includes('Cartosat') || sat.name.includes('AstroSat') || sat.name.includes('Chandrayaan') || sat.name.includes('Aditya') ? 'border-l-4 border-l-orange-500' : ''
                       )}
+                      onClick={() => setSelectedSatelliteId(sat.id)}
+                      role="button"
+                      tabIndex={0}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-start justify-between mb-3">
@@ -259,6 +267,8 @@ const Satellites = () => {
               </ScrollArea>
             </CardContent>
           </Card>
+          <SatelliteDetailPanel satellite={selectedSatellite} />
+          </div>
 
           <Footer />
         </main>
