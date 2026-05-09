@@ -110,6 +110,15 @@ const SpaceDebris = () => {
             </Card>
           </div>
 
+          {/* Kessler Analysis */}
+          <div className="mb-6">
+            <KesslerAnalysisPanel
+              totalDebris={totalDebris}
+              highRisk={stats.debris.high}
+              mediumRisk={stats.debris.medium}
+            />
+          </div>
+
           {/* Info Banner */}
           <Card className="glass-panel mb-6 border-warning/30 bg-warning/5">
             <CardContent className="p-4 flex items-start gap-3">
