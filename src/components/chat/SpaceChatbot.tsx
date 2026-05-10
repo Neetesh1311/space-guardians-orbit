@@ -3,7 +3,6 @@ import ReactMarkdown from 'react-markdown';
 import { Bot, Send, X, Sparkles, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 
@@ -137,8 +136,8 @@ export const SpaceChatbot = () => {
             </div>
           </div>
 
-          <ScrollArea className="flex-1 p-3" viewportRef={scrollRef as never}>
-            <div ref={scrollRef as never} className="space-y-3">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto p-3">
+            <div className="space-y-3">
               {messages.map((m, i) => (
                 <div
                   key={i}
@@ -160,7 +159,7 @@ export const SpaceChatbot = () => {
                 </div>
               )}
             </div>
-          </ScrollArea>
+          </div>
 
           {messages.length <= 1 && (
             <div className="px-3 pb-2 flex flex-wrap gap-1.5">
