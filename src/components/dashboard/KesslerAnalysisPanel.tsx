@@ -31,11 +31,41 @@ export const KesslerAnalysisPanel = ({ totalDebris, highRisk, mediumRisk }: Kess
     critical: 'text-destructive border-destructive/50 bg-destructive/15',
   }[level];
 
-  // Maneuver / delta-v suggestions for the worst debris families
+  // Detailed step-by-step avoidance maneuvers
   const maneuvers = [
-    { burn: 'Prograde +5 m/s', dv: 5, when: 'T+0:00 next ascending node', purpose: 'Raise apogee 8 km clear of LEO crowd' },
-    { burn: 'Retrograde -3 m/s', dv: 3, when: 'T+0:42 perigee', purpose: 'Phase shift to avoid Cosmos-1408 fragments' },
-    { burn: 'Normal +1.2 m/s', dv: 1.2, when: 'T+1:18 high-latitude crossing', purpose: 'Inclination tweak for Iridium-33 debris cloud' },
+    {
+      step: 1,
+      burn: 'Prograde +5.0 m/s',
+      dv: 5.0,
+      when: 'T+0:00 ascending node',
+      duration: '12.4 s',
+      thrust: '420 N',
+      purpose: 'Raise apogee 8 km clear of LEO debris belt',
+      conjunction: 'Cosmos-2251 fragment cloud',
+      pre: 'Verify GNC lock, slew to prograde',
+    },
+    {
+      step: 2,
+      burn: 'Retrograde -3.0 m/s',
+      dv: 3.0,
+      when: 'T+0:42 perigee',
+      duration: '7.5 s',
+      thrust: '420 N',
+      purpose: 'Phase shift to avoid Iridium-33 fragments',
+      conjunction: 'Iridium-33 / Cosmos-2251 collision residue',
+      pre: 'Confirm new conjunction screening from JSpOC',
+    },
+    {
+      step: 3,
+      burn: 'Normal +1.2 m/s',
+      dv: 1.2,
+      when: 'T+1:18 high-latitude crossing',
+      duration: '3.0 s',
+      thrust: '420 N',
+      purpose: 'Inclination tweak (+0.014°) for Cosmos-1408 cloud',
+      conjunction: 'Cosmos-1408 ASAT debris',
+      pre: 'Reaction wheels: nominal · star tracker: locked',
+    },
   ];
 
   return (
@@ -83,23 +113,41 @@ export const KesslerAnalysisPanel = ({ totalDebris, highRisk, mediumRisk }: Kess
 
         <div>
           <p className="text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1">
-            <Zap className="h-3 w-3" /> Recommended Avoidance Maneuvers
+            <Zap className="h-3 w-3" /> Automated Avoidance Plan — Step-by-Step
           </p>
           <div className="space-y-2">
-            {maneuvers.map((m, i) => (
-              <div key={i} className="rounded-lg border border-border/50 bg-secondary/20 p-2.5">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-mono text-sm font-bold text-primary">{m.burn}</span>
+            {maneuvers.map((m) => (
+              <div key={m.step} className="rounded-lg border border-border/50 bg-secondary/20 p-3">
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="h-5 w-5 grid place-items-center rounded-full bg-primary/20 text-primary text-[10px] font-bold">
+                      {m.step}
+                    </span>
+                    <span className="font-mono text-sm font-bold text-primary">{m.burn}</span>
+                  </div>
                   <Badge variant="outline" className="text-[10px]">Δv {m.dv} m/s</Badge>
                 </div>
-                <p className="text-[11px] text-muted-foreground">⏱ {m.when}</p>
-                <p className="text-[11px] mt-0.5">{m.purpose}</p>
+                <div className="grid grid-cols-2 gap-x-3 gap-y-0.5 text-[11px] text-muted-foreground">
+                  <span>⏱ {m.when}</span>
+                  <span>🔥 burn {m.duration} @ {m.thrust}</span>
+                  <span className="col-span-2 text-foreground/80">🎯 {m.purpose}</span>
+                  <span className="col-span-2">⚠ Conjunction: {m.conjunction}</span>
+                  <span className="col-span-2 italic">› Pre-burn: {m.pre}</span>
+                </div>
               </div>
             ))}
           </div>
-          <p className="text-[10px] text-muted-foreground mt-2 italic">
-            Total mission Δv budget: {maneuvers.reduce((s, m) => s + m.dv, 0).toFixed(1)} m/s — within nominal limits.
-          </p>
+          <div className="mt-3 rounded-lg border border-primary/30 bg-primary/5 p-2.5 text-[11px]">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold">Total Δv budget</span>
+              <span className="font-mono text-primary font-bold">
+                {maneuvers.reduce((s, m) => s + m.dv, 0).toFixed(1)} m/s
+              </span>
+            </div>
+            <p className="text-muted-foreground mt-1">
+              Optimal burn window opens at next ascending node · 3-σ miss-distance improves to &gt;25 km · within nominal propellant budget.
+            </p>
+          </div>
         </div>
       </CardContent>
     </Card>
