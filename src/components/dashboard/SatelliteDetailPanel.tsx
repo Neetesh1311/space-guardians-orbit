@@ -35,6 +35,21 @@ const trajectoryPrediction = (satellite: Satellite) => {
 };
 
 export const SatelliteDetailPanel = ({ satellite, compact = false }: SatelliteDetailPanelProps) => {
+  // Stable phase offset per satellite (so progress doesn't reset when selecting another)
+  const phaseOffset = useMemo(() => {
+    if (!satellite) return 0;
+    let h = 0;
+    for (let i = 0; i < satellite.id.length; i++) h = (h * 31 + satellite.id.charCodeAt(i)) | 0;
+    return Math.abs(h % 1000) / 1000;
+  }, [satellite?.id]);
+
+  // Tick every second; recompute progress from real time + phase
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, []);
+
   if (!satellite) {
     return (
       <Card className="glass-panel h-full">
@@ -49,7 +64,8 @@ export const SatelliteDetailPanel = ({ satellite, compact = false }: SatelliteDe
 
   const prediction = trajectoryPrediction(satellite);
   const riskScore = satellite.riskLevel === 'critical' ? 92 : satellite.riskLevel === 'warning' ? 58 : 18;
-  const orbitProgress = Math.round(((Date.now() / 1000 / 60) % prediction.period) / prediction.period * 100);
+  const minutesNow = now / 1000 / 60;
+  const orbitProgress = Math.round((((minutesNow % prediction.period) / prediction.period) + phaseOffset) % 1 * 100);
 
   return (
     <Card className={cn('glass-panel overflow-hidden', compact ? '' : 'h-full')}>
