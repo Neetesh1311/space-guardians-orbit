@@ -293,11 +293,14 @@ const generateDebrisPosition = (debris: Omit<SpaceDebris, 'position'>, index: nu
 export const useWorldSatellites = () => {
   const [time, setTime] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
 
   useEffect(() => {
+    setIsLoading(true);
     const timer = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(timer);
-  }, []);
+  }, [refreshKey]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -305,6 +308,11 @@ export const useWorldSatellites = () => {
     }, 100);
     return () => clearInterval(interval);
   }, []);
+
+  const refresh = () => {
+    setRefreshKey(k => k + 1);
+    setLastRefresh(new Date());
+  };
 
   const satellites = useMemo((): Satellite[] => {
     const orbitGroups: Record<string, number> = {};
@@ -353,5 +361,5 @@ export const useWorldSatellites = () => {
     }
   }), [satellites, spaceDebris]);
 
-  return { satellites, spaceDebris, isLoading, stats };
+  return { satellites, spaceDebris, isLoading, stats, refresh, lastRefresh };
 };

@@ -23,13 +23,16 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+const PAGE_SIZE = 30;
+
 const Satellites = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrbit, setSelectedOrbit] = useState<string>('all');
   const [selectedCountry, setSelectedCountry] = useState<string>('all');
   const [selectedSatelliteId, setSelectedSatelliteId] = useState<string | null>(null);
-  const { satellites, stats, isLoading } = useWorldSatellites();
+  const [page, setPage] = useState(1);
+  const { satellites, stats, isLoading, refresh, lastRefresh } = useWorldSatellites();
 
   const filteredSatellites = useMemo(() => {
     return satellites.filter(sat => {
@@ -52,7 +55,14 @@ const Satellites = () => {
       return matchesSearch && matchesOrbit && matchesCountry;
     });
   }, [satellites, searchQuery, selectedOrbit, selectedCountry]);
-  const selectedSatellite = satellites.find((sat) => sat.id === selectedSatelliteId) ?? filteredSatellites[0] ?? null;
+
+  const totalPages = Math.max(1, Math.ceil(filteredSatellites.length / PAGE_SIZE));
+  const safePage = Math.min(page, totalPages);
+  const pagedSatellites = filteredSatellites.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const selectedSatellite = satellites.find((sat) => sat.id === selectedSatelliteId) ?? pagedSatellites[0] ?? null;
+
+  // Reset to first page when filters change
+  useMemo(() => { setPage(1); }, [searchQuery, selectedOrbit, selectedCountry]);
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -196,19 +206,33 @@ const Satellites = () => {
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6">
           <Card className="glass-panel">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center justify-between">
+              <CardTitle className="text-lg flex items-center justify-between gap-2">
                 <span>Results ({filteredSatellites.length})</span>
-                <RefreshCw className={cn("h-4 w-4 text-muted-foreground", isLoading && "animate-spin")} />
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-normal text-muted-foreground hidden md:inline">
+                    Updated {lastRefresh.toLocaleTimeString()}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={refresh}
+                    disabled={isLoading}
+                    className="text-xs h-8"
+                  >
+                    <RefreshCw className={cn("h-3.5 w-3.5 mr-1", isLoading && "animate-spin")} />
+                    Refresh
+                  </Button>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[600px]">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filteredSatellites.map((sat) => (
+                  {pagedSatellites.map((sat) => (
                     <Card 
                       key={sat.id} 
                       className={cn(
-                        "bg-secondary/30 border-border/50 hover:border-primary/50 transition-all duration-300",
+                        "bg-secondary/30 border-border/50 hover:border-primary/50 transition-all duration-300 cursor-pointer",
                         selectedSatelliteId === sat.id && 'border-primary/70 glow-border',
                         sat.name.includes('GSAT') || sat.name.includes('INSAT') || sat.name.includes('IRNSS') || sat.name.includes('Cartosat') || sat.name.includes('AstroSat') || sat.name.includes('Chandrayaan') || sat.name.includes('Aditya') ? 'border-l-4 border-l-orange-500' : ''
                       )}
@@ -251,18 +275,23 @@ const Satellites = () => {
                             </span>
                             <span className="font-mono text-foreground">{sat.velocity.toFixed(2)} km/s</span>
                           </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-muted-foreground flex items-center gap-1">
-                              <MapPin className="h-3 w-3" /> Position
-                            </span>
-                            <span className="font-mono text-foreground text-[10px]">
-                              ({sat.position.x.toFixed(2)}, {sat.position.y.toFixed(2)}, {sat.position.z.toFixed(2)})
-                            </span>
-                          </div>
                         </div>
                       </CardContent>
                     </Card>
                   ))}
+                </div>
+
+                {/* Pagination */}
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/40">
+                  <p className="text-xs text-muted-foreground">
+                    Page {safePage} of {totalPages} · showing {pagedSatellites.length} of {filteredSatellites.length}
+                  </p>
+                  <div className="flex gap-1">
+                    <Button size="sm" variant="outline" onClick={() => setPage(1)} disabled={safePage === 1}>«</Button>
+                    <Button size="sm" variant="outline" onClick={() => setPage(p => Math.max(1, p - 1))} disabled={safePage === 1}>Prev</Button>
+                    <Button size="sm" variant="outline" onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}>Next</Button>
+                    <Button size="sm" variant="outline" onClick={() => setPage(totalPages)} disabled={safePage === totalPages}>»</Button>
+                  </div>
                 </div>
               </ScrollArea>
             </CardContent>

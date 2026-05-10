@@ -1,35 +1,33 @@
+import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useAsteroidData } from '@/hooks/useAsteroidData';
-import { AlertTriangle, Orbit, Zap } from 'lucide-react';
+import { AlertTriangle, Orbit, Zap, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Asteroid } from '@/types/space';
+import { AsteroidDetailDialog } from './AsteroidDetailDialog';
 
-const AsteroidItem = ({ asteroid }: { asteroid: Asteroid }) => {
+const AsteroidItem = ({ asteroid, onClick }: { asteroid: Asteroid; onClick: () => void }) => {
   const formatDistance = (km: number) => {
-    if (km > 1000000) {
-      return `${(km / 1000000).toFixed(2)}M km`;
-    }
+    if (km > 1_000_000) return `${(km / 1_000_000).toFixed(2)}M km`;
     return `${km.toLocaleString()} km`;
   };
-
   const formatDiameter = (min: number, max: number) => {
     const avg = (min + max) / 2;
-    if (avg < 1) {
-      return `${(avg * 1000).toFixed(0)}m`;
-    }
+    if (avg < 1) return `${(avg * 1000).toFixed(0)}m`;
     return `${avg.toFixed(2)}km`;
   };
 
   return (
-    <div
+    <button
+      onClick={onClick}
       className={cn(
-        'p-4 rounded-lg border transition-all duration-300 hover:scale-[1.01]',
+        'w-full text-left p-4 rounded-lg border transition-all duration-300 hover:scale-[1.01] cursor-pointer group',
         asteroid.isPotentiallyHazardous
           ? 'bg-destructive/10 border-destructive/30 hover:border-destructive/50'
-          : 'bg-secondary/30 border-border/50 hover:border-primary/30'
+          : 'bg-secondary/30 border-border/50 hover:border-primary/30',
       )}
     >
       <div className="flex items-start justify-between gap-3">
@@ -43,7 +41,6 @@ const AsteroidItem = ({ asteroid }: { asteroid: Asteroid }) => {
               </Badge>
             )}
           </div>
-          
           <div className="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-muted-foreground">
             <div className="flex items-center gap-1">
               <Orbit className="h-3 w-3 text-primary" />
@@ -59,13 +56,13 @@ const AsteroidItem = ({ asteroid }: { asteroid: Asteroid }) => {
             </div>
           </div>
         </div>
-        
-        <div className="text-right">
+        <div className="text-right flex flex-col items-end gap-1">
           <div className="text-[10px] text-muted-foreground uppercase">Approach</div>
           <div className="text-xs font-medium">{asteroid.closeApproachDate}</div>
+          <ChevronRight className="h-3 w-3 text-muted-foreground group-hover:text-primary transition" />
         </div>
       </div>
-    </div>
+    </button>
   );
 };
 
@@ -88,8 +85,8 @@ const LoadingSkeleton = () => (
 
 export const AsteroidPanel = () => {
   const { data: asteroids, isLoading, error } = useAsteroidData();
-
-  const hazardousCount = asteroids?.filter(a => a.isPotentiallyHazardous).length || 0;
+  const [selected, setSelected] = useState<Asteroid | null>(null);
+  const hazardousCount = asteroids?.filter((a) => a.isPotentiallyHazardous).length || 0;
 
   return (
     <Card variant="glass" className="h-full flex flex-col">
@@ -106,10 +103,10 @@ export const AsteroidPanel = () => {
           )}
         </div>
         <p className="text-xs text-muted-foreground">
-          Next 7 days • NASA NEO API
+          Next 7 days • NASA NEO API • click any object for details
         </p>
       </CardHeader>
-      
+
       <CardContent className="flex-1 overflow-hidden p-4 pt-0">
         <ScrollArea className="h-full pr-3">
           {isLoading ? (
@@ -121,13 +118,19 @@ export const AsteroidPanel = () => {
             </div>
           ) : (
             <div className="space-y-3">
-              {asteroids?.slice(0, 10).map((asteroid) => (
-                <AsteroidItem key={asteroid.id} asteroid={asteroid} />
+              {asteroids?.slice(0, 12).map((a) => (
+                <AsteroidItem key={a.id} asteroid={a} onClick={() => setSelected(a)} />
               ))}
             </div>
           )}
         </ScrollArea>
       </CardContent>
+
+      <AsteroidDetailDialog
+        asteroid={selected}
+        open={!!selected}
+        onOpenChange={(o) => !o && setSelected(null)}
+      />
     </Card>
   );
 };
