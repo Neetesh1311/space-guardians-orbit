@@ -206,18 +206,6 @@ const Satellites = () => {
           <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6">
           <Card className="glass-panel">
             <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center justify-between">
-                <span>Results ({filteredSatellites.length})</span>
-                <RefreshCw className={cn("h-4 w-4 text-muted-foreground", isLoading && "animate-spin")} />
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-[600px]">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Results */}
-          <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-6">
-          <Card className="glass-panel">
-            <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center justify-between gap-2">
                 <span>Results ({filteredSatellites.length})</span>
                 <div className="flex items-center gap-2">
