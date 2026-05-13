@@ -47,10 +47,17 @@ const Satellites = () => {
   const { paused: refreshPaused } = useAutoRefresh(refresh, 30_000, autoRefresh);
 
   const filteredSatellites = useMemo(() => {
-    return satellites.filter(sat => {
-      const matchesSearch = sat.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.trim().toLowerCase();
+    const list = satellites.filter(sat => {
+      const matchesSearch =
+        !q ||
+        sat.name.toLowerCase().includes(q) ||
+        sat.id.toLowerCase().includes(q) ||
+        (sat.operator?.toLowerCase().includes(q) ?? false) ||
+        (sat.mission?.toLowerCase().includes(q) ?? false);
       const matchesOrbit = selectedOrbit === 'all' || sat.orbitType === selectedOrbit;
-      
+      const matchesRisk = selectedRisk === 'all' || sat.riskLevel === selectedRisk;
+
       let matchesCountry = selectedCountry === 'all';
       if (selectedCountry === 'india') {
         matchesCountry = ['GSAT', 'INSAT', 'Cartosat', 'RISAT', 'IRNSS', 'AstroSat', 'Chandrayaan', 'Aditya', 'EOS', 'Oceansat', 'RESOURCESAT', 'XPoSat', 'Mars Orbiter', 'ScatSat'].some(n => sat.name.includes(n));
@@ -63,10 +70,18 @@ const Satellites = () => {
       } else if (selectedCountry === 'europe') {
         matchesCountry = ['Galileo', 'Sentinel', 'Meteosat', 'Eutelsat'].some(n => sat.name.includes(n));
       }
-      
-      return matchesSearch && matchesOrbit && matchesCountry;
+
+      return matchesSearch && matchesOrbit && matchesCountry && matchesRisk;
     });
-  }, [satellites, searchQuery, selectedOrbit, selectedCountry]);
+
+    if (sortByRisk) {
+      const rank = { critical: 0, warning: 1, safe: 2 } as const;
+      list.sort((a, b) => (rank[a.riskLevel] - rank[b.riskLevel]) || a.name.localeCompare(b.name));
+    } else {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    return list;
+  }, [satellites, searchQuery, selectedOrbit, selectedCountry, selectedRisk, sortByRisk]);
 
   const totalPages = Math.max(1, Math.ceil(filteredSatellites.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -74,7 +89,7 @@ const Satellites = () => {
   const selectedSatellite = satellites.find((sat) => sat.id === selectedSatelliteId) ?? pagedSatellites[0] ?? null;
 
   // Reset to first page when filters change
-  useMemo(() => { setPage(1); }, [searchQuery, selectedOrbit, selectedCountry]);
+  useMemo(() => { setPage(1); }, [searchQuery, selectedOrbit, selectedCountry, selectedRisk, sortByRisk]);
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
