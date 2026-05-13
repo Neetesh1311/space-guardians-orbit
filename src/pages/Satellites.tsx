@@ -3,23 +3,30 @@ import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Footer } from '@/components/layout/Footer';
 import { useWorldSatellites } from '@/hooks/useWorldSatellites';
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SatelliteDetailPanel } from '@/components/dashboard/SatelliteDetailPanel';
-import { 
-  Search, 
-  Satellite, 
-  Globe2, 
-  Signal, 
-  Gauge, 
+import { exportSatellitesCSV } from '@/lib/exporters';
+import {
+  Search,
+  Satellite,
+  Globe2,
+  Signal,
+  Gauge,
   MapPin,
   Filter,
   RefreshCw,
-  Flag
+  Flag,
+  ShieldAlert,
+  ArrowDownAZ,
+  FileDown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -30,9 +37,14 @@ const Satellites = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrbit, setSelectedOrbit] = useState<string>('all');
   const [selectedCountry, setSelectedCountry] = useState<string>('all');
+  const [selectedRisk, setSelectedRisk] = useState<string>('all');
+  const [sortByRisk, setSortByRisk] = useState(true);
+  const [autoRefresh, setAutoRefresh] = useState(false);
   const [selectedSatelliteId, setSelectedSatelliteId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const { satellites, stats, isLoading, refresh, lastRefresh } = useWorldSatellites();
+
+  const { paused: refreshPaused } = useAutoRefresh(refresh, 30_000, autoRefresh);
 
   const filteredSatellites = useMemo(() => {
     return satellites.filter(sat => {
