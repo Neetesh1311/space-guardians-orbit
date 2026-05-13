@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import type { Satellite } from '@/types/space';
-import { Activity, Calendar, Gauge, Globe2, Radio, Rocket, Satellite as SatelliteIcon, Shield, Target } from 'lucide-react';
+import { Activity, Calendar, FileDown, FileText, Gauge, Globe2, Radio, Rocket, Satellite as SatelliteIcon, Shield, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { exportSatelliteCSV, exportSatellitePDF } from '@/lib/exporters';
 
 interface SatelliteDetailPanelProps {
   satellite: Satellite | null;
@@ -142,6 +144,15 @@ export const SatelliteDetailPanel = ({ satellite, compact = false }: SatelliteDe
               <span>Collision risk model</span>
               <Badge variant="outline" className={riskTone(satellite.riskLevel)}>{riskScore}% confidence</Badge>
             </div>
+          </div>
+
+          <div className="flex gap-2 pt-1">
+            <Button size="sm" variant="outline" className="flex-1 h-8 text-xs" onClick={() => exportSatelliteCSV(satellite)}>
+              <FileDown className="h-3.5 w-3.5 mr-1" /> CSV
+            </Button>
+            <Button size="sm" variant="outline" className="flex-1 h-8 text-xs" onClick={() => exportSatellitePDF(satellite)}>
+              <FileText className="h-3.5 w-3.5 mr-1" /> PDF
+            </Button>
           </div>
         </div>
       </CardContent>

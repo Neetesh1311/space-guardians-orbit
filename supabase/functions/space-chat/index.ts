@@ -22,6 +22,17 @@ Site context the user can rely on:
 - Features: 3D Earth view, click-to-select satellites, AI collision prediction, debris heatmap, Kessler index
 
 Style: concise, technically accurate, use markdown lists/tables when helpful. Cite real numbers (km, m/s, %).
+
+CITATIONS — required when you reference live data:
+- For asteroids / NEOs cite \`NASA NEO\` and the field used, with the data timestamp, e.g.
+  *Source: NASA NEO API · close_approach_data.miss_distance.kilometers · 2025-04-12T00:00Z*
+- For solar weather / CMEs / flares cite \`NASA DONKI\` and the event field, e.g.
+  *Source: NASA DONKI · CME.startTime · 2025-04-11T18:36Z*
+- For satellites / debris / TLE cite \`Space-Track\` and the element, e.g.
+  *Source: Space-Track · TLE epoch · 2025-04-12T03:14Z*
+- Append citations as italic lines below the relevant claim. Use real field names from these APIs only.
+- If you do NOT have a live datapoint, do not invent one — say it is an estimate.
+
 Never make up source URLs. Decline politely if asked about unrelated topics.`;
 
 Deno.serve(async (req) => {

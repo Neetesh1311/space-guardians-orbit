@@ -3,23 +3,30 @@ import { Header } from '@/components/layout/Header';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Footer } from '@/components/layout/Footer';
 import { useWorldSatellites } from '@/hooks/useWorldSatellites';
+import { useAutoRefresh } from '@/hooks/useAutoRefresh';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { SatelliteDetailPanel } from '@/components/dashboard/SatelliteDetailPanel';
-import { 
-  Search, 
-  Satellite, 
-  Globe2, 
-  Signal, 
-  Gauge, 
+import { exportSatellitesCSV } from '@/lib/exporters';
+import {
+  Search,
+  Satellite,
+  Globe2,
+  Signal,
+  Gauge,
   MapPin,
   Filter,
   RefreshCw,
-  Flag
+  Flag,
+  ShieldAlert,
+  ArrowDownAZ,
+  FileDown,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -30,15 +37,27 @@ const Satellites = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedOrbit, setSelectedOrbit] = useState<string>('all');
   const [selectedCountry, setSelectedCountry] = useState<string>('all');
+  const [selectedRisk, setSelectedRisk] = useState<string>('all');
+  const [sortByRisk, setSortByRisk] = useState(true);
+  const [autoRefresh, setAutoRefresh] = useState(false);
   const [selectedSatelliteId, setSelectedSatelliteId] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const { satellites, stats, isLoading, refresh, lastRefresh } = useWorldSatellites();
 
+  const { paused: refreshPaused } = useAutoRefresh(refresh, 30_000, autoRefresh);
+
   const filteredSatellites = useMemo(() => {
-    return satellites.filter(sat => {
-      const matchesSearch = sat.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const q = searchQuery.trim().toLowerCase();
+    const list = satellites.filter(sat => {
+      const matchesSearch =
+        !q ||
+        sat.name.toLowerCase().includes(q) ||
+        sat.id.toLowerCase().includes(q) ||
+        (sat.operator?.toLowerCase().includes(q) ?? false) ||
+        (sat.mission?.toLowerCase().includes(q) ?? false);
       const matchesOrbit = selectedOrbit === 'all' || sat.orbitType === selectedOrbit;
-      
+      const matchesRisk = selectedRisk === 'all' || sat.riskLevel === selectedRisk;
+
       let matchesCountry = selectedCountry === 'all';
       if (selectedCountry === 'india') {
         matchesCountry = ['GSAT', 'INSAT', 'Cartosat', 'RISAT', 'IRNSS', 'AstroSat', 'Chandrayaan', 'Aditya', 'EOS', 'Oceansat', 'RESOURCESAT', 'XPoSat', 'Mars Orbiter', 'ScatSat'].some(n => sat.name.includes(n));
@@ -51,10 +70,18 @@ const Satellites = () => {
       } else if (selectedCountry === 'europe') {
         matchesCountry = ['Galileo', 'Sentinel', 'Meteosat', 'Eutelsat'].some(n => sat.name.includes(n));
       }
-      
-      return matchesSearch && matchesOrbit && matchesCountry;
+
+      return matchesSearch && matchesOrbit && matchesCountry && matchesRisk;
     });
-  }, [satellites, searchQuery, selectedOrbit, selectedCountry]);
+
+    if (sortByRisk) {
+      const rank = { critical: 0, warning: 1, safe: 2 } as const;
+      list.sort((a, b) => (rank[a.riskLevel] - rank[b.riskLevel]) || a.name.localeCompare(b.name));
+    } else {
+      list.sort((a, b) => a.name.localeCompare(b.name));
+    }
+    return list;
+  }, [satellites, searchQuery, selectedOrbit, selectedCountry, selectedRisk, sortByRisk]);
 
   const totalPages = Math.max(1, Math.ceil(filteredSatellites.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages);
@@ -62,7 +89,7 @@ const Satellites = () => {
   const selectedSatellite = satellites.find((sat) => sat.id === selectedSatelliteId) ?? pagedSatellites[0] ?? null;
 
   // Reset to first page when filters change
-  useMemo(() => { setPage(1); }, [searchQuery, selectedOrbit, selectedCountry]);
+  useMemo(() => { setPage(1); }, [searchQuery, selectedOrbit, selectedCountry, selectedRisk, sortByRisk]);
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
@@ -149,7 +176,7 @@ const Satellites = () => {
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search satellites..."
+                    placeholder="Search by name, NORAD ID, operator, mission…"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10 bg-secondary/50"
@@ -197,6 +224,54 @@ const Satellites = () => {
                       {country.label}
                     </Button>
                   ))}
+                </div>
+              </div>
+
+              {/* Risk + sort + auto-refresh row */}
+              <div className="mt-4 flex flex-wrap items-center gap-3 pt-3 border-t border-border/40">
+                <div className="flex gap-1.5 flex-wrap items-center">
+                  <ShieldAlert className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground mr-1">Risk:</span>
+                  {['all', 'critical', 'warning', 'safe'].map((r) => (
+                    <Button
+                      key={r}
+                      size="sm"
+                      variant={selectedRisk === r ? 'default' : 'outline'}
+                      onClick={() => setSelectedRisk(r)}
+                      className="text-xs h-7 capitalize"
+                    >
+                      {r}
+                    </Button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 ml-auto">
+                  <Button
+                    size="sm"
+                    variant={sortByRisk ? 'default' : 'outline'}
+                    onClick={() => setSortByRisk((v) => !v)}
+                    className="text-xs h-7"
+                    title="Toggle sort"
+                  >
+                    <ArrowDownAZ className="h-3.5 w-3.5 mr-1" />
+                    {sortByRisk ? 'Sort: highest risk first' : 'Sort: A → Z'}
+                  </Button>
+
+                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-md border border-border/50 bg-secondary/30">
+                    <Switch id="auto-refresh" checked={autoRefresh} onCheckedChange={setAutoRefresh} />
+                    <Label htmlFor="auto-refresh" className="text-xs cursor-pointer">
+                      Auto-refresh{autoRefresh && (refreshPaused ? ' · paused' : ' · 30s')}
+                    </Label>
+                  </div>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs h-7"
+                    onClick={() => exportSatellitesCSV(filteredSatellites, lastRefresh)}
+                  >
+                    <FileDown className="h-3.5 w-3.5 mr-1" /> Export CSV
+                  </Button>
                 </div>
               </div>
             </CardContent>

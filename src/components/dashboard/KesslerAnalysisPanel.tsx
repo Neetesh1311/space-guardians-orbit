@@ -1,8 +1,10 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Shield, AlertTriangle, Activity, Zap, TrendingUp } from 'lucide-react';
+import { Shield, AlertTriangle, Activity, Zap, TrendingUp, FileDown, FileText } from 'lucide-react';
 import { useMemo } from 'react';
+import { exportAvoidancePlanCSV, exportAvoidancePlanPDF } from '@/lib/exporters';
 
 interface KesslerAnalysisPanelProps {
   totalDebris: number;
@@ -147,6 +149,24 @@ export const KesslerAnalysisPanel = ({ totalDebris, highRisk, mediumRisk }: Kess
             <p className="text-muted-foreground mt-1">
               Optimal burn window opens at next ascending node · 3-σ miss-distance improves to &gt;25 km · within nominal propellant budget.
             </p>
+            <div className="mt-2 flex gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-[11px] flex-1"
+                onClick={() => exportAvoidancePlanCSV(maneuvers, { kesslerIndex, level, lastRefresh: new Date() })}
+              >
+                <FileDown className="h-3 w-3 mr-1" /> CSV
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                className="h-7 text-[11px] flex-1"
+                onClick={() => exportAvoidancePlanPDF(maneuvers, { kesslerIndex, level, lastRefresh: new Date() })}
+              >
+                <FileText className="h-3 w-3 mr-1" /> PDF
+              </Button>
+            </div>
           </div>
         </div>
       </CardContent>
