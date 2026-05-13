@@ -176,7 +176,7 @@ const Satellites = () => {
                 <div className="flex-1 relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search satellites..."
+                    placeholder="Search by name, NORAD ID, operator, mission…"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="pl-10 bg-secondary/50"
@@ -224,6 +224,54 @@ const Satellites = () => {
                       {country.label}
                     </Button>
                   ))}
+                </div>
+              </div>
+
+              {/* Risk + sort + auto-refresh row */}
+              <div className="mt-4 flex flex-wrap items-center gap-3 pt-3 border-t border-border/40">
+                <div className="flex gap-1.5 flex-wrap items-center">
+                  <ShieldAlert className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground mr-1">Risk:</span>
+                  {['all', 'critical', 'warning', 'safe'].map((r) => (
+                    <Button
+                      key={r}
+                      size="sm"
+                      variant={selectedRisk === r ? 'default' : 'outline'}
+                      onClick={() => setSelectedRisk(r)}
+                      className="text-xs h-7 capitalize"
+                    >
+                      {r}
+                    </Button>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-2 ml-auto">
+                  <Button
+                    size="sm"
+                    variant={sortByRisk ? 'default' : 'outline'}
+                    onClick={() => setSortByRisk((v) => !v)}
+                    className="text-xs h-7"
+                    title="Toggle sort"
+                  >
+                    <ArrowDownAZ className="h-3.5 w-3.5 mr-1" />
+                    {sortByRisk ? 'Sort: highest risk first' : 'Sort: A → Z'}
+                  </Button>
+
+                  <div className="flex items-center gap-1.5 px-2 py-1 rounded-md border border-border/50 bg-secondary/30">
+                    <Switch id="auto-refresh" checked={autoRefresh} onCheckedChange={setAutoRefresh} />
+                    <Label htmlFor="auto-refresh" className="text-xs cursor-pointer">
+                      Auto-refresh{autoRefresh && (refreshPaused ? ' · paused' : ' · 30s')}
+                    </Label>
+                  </div>
+
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-xs h-7"
+                    onClick={() => exportSatellitesCSV(filteredSatellites, lastRefresh)}
+                  >
+                    <FileDown className="h-3.5 w-3.5 mr-1" /> Export CSV
+                  </Button>
                 </div>
               </div>
             </CardContent>
