@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { LoadingScreen } from "@/components/layout/LoadingScreen";
 import { SpaceChatbot } from "@/components/chat/SpaceChatbot";
+import { VoiceWelcome } from "@/components/voice/VoiceWelcome";
 import Index from "./pages/Index";
 import LaunchPlanner from "./pages/LaunchPlanner";
 import SolarActivity from "./pages/SolarActivity";
@@ -42,6 +43,7 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
           <SpaceChatbot />
+          <VoiceWelcome />
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
